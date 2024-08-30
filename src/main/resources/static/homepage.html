@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Homepage</title>
+    <title>Export stock info into excel</title>
 </head>
 <body>
-    <h1>Welcome to My Homepage</h1>
-    <p>Please enter in the ticker of the stock you want exported (I.E. AAPL)</p>
+    <form action="/processData" method="post">
+        <h1>Welcome to My Homepage</h1>
+        <p>Enter in the ticker of the stock you want exported (I.E. AAPL)</p>
+        <input type="text" id="ticker" name="ticker">
+        <p>Enter excel filename</p>
+        <input type="text" id="filename" name="filename">
+    </form>
 </body>
 </html>
