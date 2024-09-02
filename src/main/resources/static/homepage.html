@@ -4,12 +4,15 @@
     <title>Export stock info into excel</title>
 </head>
 <body>
-    <form action="/processData" method="post">
+    <form action="/script/getScript" method="GET">
         <h1>Welcome to My Homepage</h1>
         <p>Enter in the ticker of the stock you want exported (I.E. AAPL)</p>
-        <input type="text" id="ticker" name="ticker">
+        <input type="text" id="ticker" name="ticker" required>
+        <p>Enter in the date you would like to see data from</p> (I.E. 2020-01-01)
+        <input type="text" id="date" name="date" required>
         <p>Enter excel filename</p>
-        <input type="text" id="filename" name="filename">
+        <input type="text" id="filename" name="filename" required>
+        <button type="submit">submit</button>
     </form>
 </body>
 </html>
