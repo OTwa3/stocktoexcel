@@ -12,13 +12,13 @@ import java.io.InputStreamReader;
 @RequestMapping("/script")
 public class ScriptController {
     @GetMapping("/getScript")
-    public String getScript(@RequestParam("ticker") String ticker, @RequestParam("date") String date, @RequestParam("filename") String filename) {
+    public String getScript(@RequestParam("ticker") String ticker, @RequestParam("startdate") String startdate, @RequestParam("enddate") String enddate, @RequestParam("filename") String filename) {
         try {
             
-            ProcessBuilder pb = new ProcessBuilder("python", "script.py", ticker, filename, date);
+            ProcessBuilder pb = new ProcessBuilder("python", "script.py", ticker, filename, startdate, enddate);
             Process process = pb.start();
 
-            //Capture output (optional)
+           
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
