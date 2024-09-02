@@ -67,6 +67,8 @@ for date in dates:
 
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data for date {date}: {e}")
+        print("Exiting script...")
+        sys.exit(1)
 
 
 print(excel_filepath)

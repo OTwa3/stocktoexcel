@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+// import org.springframework.web.bind.annotation.PostMapping;
+// import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @Controller
@@ -25,12 +28,20 @@ public class ScriptController {
                 System.out.println(line);
             }
             
-            process.waitFor();
+            int exitCode = process.waitFor();
+                if (exitCode == 1) {
+                return "/error";
+            }
+           
+            System.out.println("Script executed successfully");
+            return "/success";
         } catch (Exception e) {
             e.printStackTrace();
+            return "/error";
         }
-        System.out.println("Script executed successfully");
-        return "/success";
+        
     }
+
+
 }
 
