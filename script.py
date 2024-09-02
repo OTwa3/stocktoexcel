@@ -11,6 +11,26 @@ def get_dates(start_date, end_date):
     start = datetime.strptime(start_date, "%Y-%m-%d")
     end = datetime.strptime(end_date, "%Y-%m-%d")
     return [(start + timedelta(days=x)).strftime("%Y-%m-%d") for x in range(0, (end-start).days + 1)]
+   
+
+def calculate_percentage_change(df):
+    df['drop/gain'] = ((df['close'] - df['open']) / df['open']) * 100
+    df['drop/gain'] = df['drop/gain'].round(2)
+    df['drop/gain'] = df['drop/gain'].astype(str) + '%'
+    return df
+
+def total_percentage_change(df):
+    initial_open = df.iloc[0]['open']
+    final_close = df.iloc[-1]['close']
+    
+    total_change = ((final_close - initial_open) / initial_open * 100).round(2)
+    total_change = f"{total_change}%"
+    
+    df['totalchange'] = [None] * (len(df) - 1) + [total_change]
+
+    return df
+
+
 
 print("Running script...")
 
@@ -50,6 +70,8 @@ for date in dates:
 
 
 print(excel_filepath)
+combined_df = calculate_percentage_change(combined_df)
+
 
 if os.path.exists(excel_filepath):
    
@@ -58,11 +80,13 @@ if os.path.exists(excel_filepath):
     
     
     combined_df = pd.concat([existing_df, combined_df], ignore_index=True)
+    combined_df = total_percentage_change(combined_df)
     print(combined_df.head())
     combined_df.to_excel(excel_filepath, index=False)
 else:
    
     print("File does not exist, writing data...")
+    combined_df = total_percentage_change(combined_df)
     combined_df.to_excel(excel_filepath, index=False)
 
 
