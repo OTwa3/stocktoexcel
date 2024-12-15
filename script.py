@@ -2,6 +2,7 @@ import os
 import sys
 import requests
 import pandas as pd
+#import xlsxwriter
 import openpyxl
 from datetime import datetime, timedelta
 
@@ -30,6 +31,50 @@ def total_percentage_change(df):
 
     return df
 
+def generate_graph(excel_filepath):
+    from openpyxl import load_workbook
+    from openpyxl.chart import LineChart, Reference
+    from openpyxl.styles import numbers
+
+    wb = load_workbook(excel_filepath)
+    ws = wb.active
+
+    drop_gain_col = 8
+    date_col = 2  # Assuming the second column contains dates
+
+    # Ensure the drop/gain values are properly formatted as percentages
+    for row in range(2, ws.max_row + 1):
+        cell = ws.cell(row=row, column=drop_gain_col)
+        if isinstance(cell.value, str) and cell.value.endswith('%'):
+            cell.value = float(cell.value.strip('%')) / 100
+        cell.number_format = '0.00%'
+
+    # Ensure the date column contains valid date formats for Excel
+    for row in range(2, ws.max_row + 1):
+        date_cell = ws.cell(row=row, column=date_col)
+        if isinstance(date_cell.value, str):
+            try:
+                date_cell.value = date_cell.value.strip()
+            except Exception as e:
+                print(f"Error processing date on row {row}: {e}")
+        date_cell.number_format = numbers.FORMAT_DATE_XLSX14
+
+    # Create the LineChart
+    chart = LineChart()
+    chart.title = "Daily Drop/Gain Percentage"
+    chart.y_axis.title = "Percentage"
+    chart.x_axis.title = "Date"
+
+    # Reference data and categories
+    data = Reference(ws, min_col=drop_gain_col, min_row=1, max_col=drop_gain_col, max_row=ws.max_row)
+    categories = Reference(ws, min_col=date_col, min_row=2, max_row=ws.max_row)  # Categories are dates from row 2 onward
+
+    chart.add_data(data, titles_from_data=True)
+    chart.set_categories(categories)
+    
+    # Add the chart to the worksheet
+    ws.add_chart(chart, "J2")
+    wb.save(excel_filepath)
 
 
 print("Running script...")
@@ -85,11 +130,13 @@ if os.path.exists(excel_filepath):
     combined_df = total_percentage_change(combined_df)
     print(combined_df.head())
     combined_df.to_excel(excel_filepath, index=False)
+    generate_graph(excel_filepath)
 else:
    
     print("File does not exist, writing data...")
     combined_df = total_percentage_change(combined_df)
     combined_df.to_excel(excel_filepath, index=False)
+    generate_graph(excel_filepath)
 
 
 print(f"Data has been written to {excel_filepath}")
