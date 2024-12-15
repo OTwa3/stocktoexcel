@@ -2,7 +2,6 @@ import os
 import sys
 import requests
 import pandas as pd
-#import xlsxwriter
 import openpyxl
 from datetime import datetime, timedelta
 
@@ -34,45 +33,34 @@ def total_percentage_change(df):
 def generate_graph(excel_filepath):
     from openpyxl import load_workbook
     from openpyxl.chart import LineChart, Reference
-    from openpyxl.styles import numbers
 
     wb = load_workbook(excel_filepath)
     ws = wb.active
 
-    drop_gain_col = 8
-    date_col = 2  # Assuming the second column contains dates
+    opening_price_col = 3  
+    closing_price_col = 4  
+    date_col = 2           
 
-    # Ensure the drop/gain values are properly formatted as percentages
-    for row in range(2, ws.max_row + 1):
-        cell = ws.cell(row=row, column=drop_gain_col)
-        if isinstance(cell.value, str) and cell.value.endswith('%'):
-            cell.value = float(cell.value.strip('%')) / 100
-        cell.number_format = '0.00%'
-
-    # Ensure the date column contains valid date formats for Excel
-    for row in range(2, ws.max_row + 1):
-        date_cell = ws.cell(row=row, column=date_col)
-        if isinstance(date_cell.value, str):
-            try:
-                date_cell.value = date_cell.value.strip()
-            except Exception as e:
-                print(f"Error processing date on row {row}: {e}")
-        date_cell.number_format = numbers.FORMAT_DATE_XLSX14
-
-    # Create the LineChart
+   
     chart = LineChart()
-    chart.title = "Daily Drop/Gain Percentage"
-    chart.y_axis.title = "Percentage"
-    chart.x_axis.title = "Date"
+    chart.title = "Daily Opening vs Closing Price"
+    #chart.y_axis.title = "Price"
+    #chart.x_axis.title = "Date"
 
-    # Reference data and categories
-    data = Reference(ws, min_col=drop_gain_col, min_row=1, max_col=drop_gain_col, max_row=ws.max_row)
-    categories = Reference(ws, min_col=date_col, min_row=2, max_row=ws.max_row)  # Categories are dates from row 2 onward
-
-    chart.add_data(data, titles_from_data=True)
-    chart.set_categories(categories)
     
-    # Add the chart to the worksheet
+    opening_data = Reference(ws, min_col=opening_price_col, min_row=1, max_row=ws.max_row)
+    closing_data = Reference(ws, min_col=closing_price_col, min_row=1, max_row=ws.max_row)
+
+    
+    categories = Reference(ws, min_col=date_col, min_row=2, max_row=ws.max_row)
+
+    
+    chart.add_data(opening_data, titles_from_data=True)
+    chart.add_data(closing_data, titles_from_data=True)
+    chart.set_categories(categories)
+
+    chart.style = 7
+
     ws.add_chart(chart, "J2")
     wb.save(excel_filepath)
 
